@@ -21,8 +21,7 @@ update:
 
 srcdir:
 	-@mkdir -p $(REPO)
-	 cp -rf ../salt  $(REPO)
-
+	$(shell tar xf - -c --exclude-vcs --exclude='*pkg*' | ( cd ${REPO} && tar xbf -) )
 pkg:
 	cd $(SRC) ;\
 	dpkg-buildpackage -uc -us -tc
