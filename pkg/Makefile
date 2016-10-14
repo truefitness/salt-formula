@@ -1,4 +1,3 @@
-SHELL:=/bin/bash -s extglob
 APP=salt
 FORMULANAME=true-$(APP)-formula
 SRC=src
@@ -20,9 +19,10 @@ update:
 	( cd $(REPO); git fetch ; git pull )
 
 srcdir:
-	-@mkdir -p $(REPO)
-	$(shell tar xf - -c --exclude-vcs --exclude='*pkg*' | ( cd ${REPO} && tar xbf -) )
-pkg:
+	-@mkdir -p ${REPO}
+	tar cvf - ../* --exclude-vcs --exclude='pkg' | ( cd ${REPO} && tar xBvf - )
+
+pkg:  srcdir
 	cd $(SRC) ;\
 	dpkg-buildpackage -uc -us -tc
 	-@mkdir -p $(QUEUE)
