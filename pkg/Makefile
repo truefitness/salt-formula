@@ -20,7 +20,7 @@ update:
 
 srcdir:
 	-@mkdir -p ${REPO}
-	tar cvf - ../* --exclude-vcs --exclude='pkg' | ( cd ${REPO} && tar xBvf - )
+	tar cvf - ../* --exclude-vcs --exclude='pkg' |  tar xBvf - -C ${REPO}
 
 pkg:  srcdir
 	cd $(SRC) ;\
