@@ -21,6 +21,13 @@ salt:
     salt-syndic: 'salt-syndic'
     salt-cloud: 'salt-cloud'
     salt-ssh: 'salt-ssh'
+    pyinotify: 'python-pyinotify' the package to be installed for pyinotify
+
+  # Set which release of SaltStack to use, default to 'latest'
+  # To get the available releases:
+  # * http://repo.saltstack.com/yum/redhat/7/x86_64/
+  # * http://repo.saltstack.com/apt/debian/8/amd64/
+  release: "2016.11"
 
   # salt master config
   master:
@@ -95,6 +102,13 @@ salt:
             type: runner
             cmd: jobs.list_jobs
 
+    # optional: these reactors will be configured on the master
+    # They override reactors configured in
+    # 'salt:reactors' or the old 'salt:reactor' parameters
+    reactors:
+      - 'master/deploy':
+        - /srv/salt/reactors/deploy.sls
+
   # salt minion config:
   minion:
 
@@ -137,6 +151,13 @@ salt:
     mine_functions:
       network.interface_ip: [eth0]
 
+    # Define a minion scheduler
+    schedule:
+      - highstate:
+        - function: state.apply
+        - minutes: 60
+        - returner: redis
+
     # other 'non-default' config
     auth_keytab: /root/auth.keytab
     auth_principal: kadmin/admin
@@ -171,6 +192,12 @@ salt:
           - 1.0
         interval: 10
 
+    # Optional reactors: these reactors will be configured on the minion
+    # They override reactors configured in
+    # 'salt:reactors' or the old 'salt:reactor' parameters
+    reactors:
+      - 'minion/deploy':
+        - /srv/salt/reactors/deploy.sls
 
   # salt cloud config
   cloud:
@@ -229,9 +256,7 @@ salt:
       - IAD
       - SYD
       - HKG
-  reactor:
-    - 'deploy':
-      - /srv/salt/reactors/deploy.sls
+
   ssh_roster:
     prod1:
       host: host.example.com
@@ -248,6 +273,11 @@ salt:
           -----END RSA PRIVATE KEY-----
         pub: |
           ...........
+
+  # These reactors will be configured both in the minion and the master
+  reactors:
+    - 'deploy':
+      - /srv/salt/reactors/deploy.sls
 
 salt_cloud_certs:
   aws:
